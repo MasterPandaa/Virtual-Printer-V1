@@ -1,80 +1,50 @@
-# Virtual Printer V1 — Lightweight RAW TCP/IP Printer Emulator
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MasterPandaa/MasterPandaa/main/assets/banners/Virtual-Printer-V1.svg" alt="Virtual Printer V1 Banner" width="100%">
+</p>
 
-[![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=flat&logo=python&logoColor=white)](#)
-[![Protocol](https://img.shields.io/badge/Protocol-RAW%20TCP%2FIP%20(Port%209100)-blue.svg)](#)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Standard%20Library%20Only-orange.svg)](#)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-A portable desktop GUI application that emulates a network receipt/document printer listening on standard **RAW TCP/IP socket port 9100** (JetDirect protocol).
-
-Built for **Software Engineers**, **QA/SDET Automation**, and **DevOps** teams to test POS receipt dispatching, invoice printers, ESC/POS command sequences, and backend socket print drivers without requiring physical printer hardware.
-
----
+<p align="center">
+  <img src="https://img.shields.io/badge/Protocol-RAW_TCP%2FIP_Socket-2563EB?style=flat-square" alt="Socket">
+  <img src="https://img.shields.io/badge/Port-Port_9100_Standard-10B981?style=flat-square" alt="Port 9100">
+  <img src="https://img.shields.io/badge/Standard-ESC%2FPOS_Emulation-0891B2?style=flat-square" alt="ESC/POS">
+  <img src="https://img.shields.io/badge/Dependencies-Zero_External_Libs-orange?style=flat-square" alt="Zero Libs">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-gray?style=flat-square" alt="License"></a>
+</p>
 
 ## Overview
 
-Developing and testing printing workflows in staging environments often introduces friction due to hardware maintenance, network cabling, or paper consumption. Virtual Printer V1 emulates socket reception locally:
+Testing Point of Sale (POS) and Enterprise Resource Planning (ERP) receipt printing routines typically demands physical thermal printer hardware, wasting rolls of paper and slowing automated software release cycles. 
 
-- **Hardware-Free Testing**: Intercepts print streams over localhost or LAN during development and automated CI/CD runs.
-- **Real-Time Stream Diagnostics**: Logs connection handshakes, remote client IPs/ports, payload sizes, and connection durations.
-- **Multithreaded Socket Engine**: Background worker threads accept incoming socket connections without stalling the UI.
-- **Dual Stream Decoding**: Decodes textual data (UTF-8, Latin-1) alongside raw binary ESC/POS command streams.
-- **Zero External Dependencies**: Implemented entirely with Python's standard library (`socket`, `threading`, `tkinter`) with no `pip install` required.
+Virtual-Printer-V1 is a lightweight desktop network printer emulator written in Python. It listens as a RAW TCP/IP socket server on **Port 9100** (the standard JetDirect / RAW print port), captures incoming document streams in real time, and renders print payloads directly to your screen with zero external dependencies.
 
 ---
 
-## Technical Features
+## Core Capabilities
 
-1. **RAW 9100 Socket Listener**: Configurable port binding (default `9100`) handling multiple sequential client connections.
-2. **Payload Inspector**: Real-time display of incoming print streams with automatic character-set fallback decoding.
-3. **Session Diagnostics**: Instant inspection of client endpoints, timestamped transactions, and socket state logs.
-4. **Dark Desktop Interface**: Ergonomic Tkinter interface with single-click start/stop and clear-log operations.
+- **Standard Port 9100 Server**: Binds to standard RAW TCP/IP printing ports, accepting streams from any POS software or network print driver.
+- **Zero-Dependency Core**: Built purely on Python socket and Tkinter standard libraries, running immediately on any workstation.
+- **Real-Time Stream Inspector**: Displays received byte streams and ASCII text feeds with live connection status indicators.
+- **Payload Archiving**: Automatically logs received print jobs into timestamped text files for regression comparison.
 
 ---
 
 ## Quickstart
 
-### Prerequisites
+```bash
+git clone https://github.com/MasterPandaa/Virtual-Printer-V1.git
+cd Virtual-Printer-V1
+python printer_server.py
+```
 
-- Python 3.8+ with `tkinter` support (standard on Windows and macOS Python installers).
-- *On Linux (Debian/Ubuntu)*: `sudo apt install python3-tk`
-
-### Installation & Run
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/MasterPandaa/Virtual-Printer-V1.git
-   cd Virtual-Printer-V1
-   ```
-
-2. **Launch the emulator**:
-   ```bash
-   python app.py
-   ```
-   *(On Windows, you can also double-click `run.bat`)*
-
-3. **Send a test print via TCP socket**:
-   ```powershell
-   # Windows PowerShell test
-   $client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 9100)
-   $stream = $client.GetStream()
-   $writer = New-Object System.IO.StreamWriter($stream)
-   $writer.WriteLine("Hello from Virtual Printer Test!")
-   $writer.Flush()
-   $client.Close()
-   ```
-
----
-
-## Project Structure
-
-```text
-Virtual-Printer-V1/
-├── app.py                      # Application entry point, Tkinter UI & socket handler
-├── run.bat                     # Windows quickstart batch launcher
-├── README.md                   # Project documentation
-└── LICENSE                     # MIT License
+Send a test stream from PowerShell:
+```powershell
+$client = New-Object System.Net.Sockets.TcpClient('127.0.0.1', 9100)
+$stream = $client.GetStream()
+$writer = New-Object System.IO.StreamWriter($stream)
+$writer.WriteLine("--- TEST RECEIPT ---")
+$writer.WriteLine("Item: Coffee")
+$writer.WriteLine("Total: $4.50")
+$writer.Flush()
+$client.Close()
 ```
 
 ---
